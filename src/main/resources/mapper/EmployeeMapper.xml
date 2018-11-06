@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lss.hrmsys.entity.dao.EmployeeDao">
+    <!-- 自定义结果集 -->
+    <resultMap type="Employee" id="EmployeeResult">
+        <id property="id" column="emp_id" />
+        <result property="name" column="emp_name" />
+        <result property="sex" column="sex" />
+        <result property="nation" column="nation" />
+        <result property="location" column="location" />
+        <result property="party" column="party" />
+        <result property="armyday" column="armyday" />
+        <result property="birthday" column="birthday" />
+        <result property="workday" column="workday" />
+        <result property="dept_id" column="dept_id" />
+        <result property="pos_id" column="pos_id" />
+        <!-- 关联映射：association -->
+        <association property="department" javaType="Department">
+            <id property="id" column="dept_id" />
+            <result property="name" column="dept_name" />
+            <result property="description" column="dept_description" />
+        </association>
+        <association property="position" javaType="Position">
+            <id property="id" column="pos_id" />
+            <result property="name" column="pos_name" />
+            <result property="description" column="pos_description" />
+        </association>
+    </resultMap>
+    <!-- 根据条件查询员工 -->
+    <select id="findEmployees" parameterType="Map" resultMap="EmployeeResult">
+        select e.emp_id,e.emp_name,e.sex,e.nation,e.location,e.party,e.armyday,e.birthday, e.workday, e.dept_id, e.pos_id, d.dept_id,d.dept_name, d.dept_description, p.pos_id,p.pos_name, p.pos_description
+        from employee_tb e,dept_tb d,position_tb p where e.dept_id = d.dept_id
+        and e.pos_id = p.pos_id
+        <if test="id!=null and id!='' ">
+            and e.emp_id like #{id}
+        </if>
+        <if test="name!=null and name!='' ">
+            and e.emp_name like #{name}
+        </if>
+        <if test="department_name!=null and department_name!='' ">
+            and d.dept_name like #{department_name}
+        </if>
+        <if test="position_name!=null and position_name!='' ">
+            and p.pos_name like #{position_name}
+        </if>
+        <if test="sex!=null and sex!='' ">
+            and e.sex like #{sex}
+        </if>
+        <if test="nation!=null and nation!='' ">
+            and e.nation like #{nation}
+        </if>
+        <if test="party!=null and party!='' ">
+            and e.party like #{party}
+        </if>
+        <if test="pos_id!=null and pos_id!='' ">
+            and e.pos_id like #{pos_id}
+        </if>
+        <if test="dept_id!=null and dept_id!='' ">
+            and e.dept_id like #{dept_id}
+        </if>
+    </select>
+    <!-- 根据条件查询员工人数 -->
+    <select id="getCount" parameterType="Map" resultType="Integer">
+        select count(*) from employee_tb e,dept_tb d,position_tb p where
+        e.dept_id = d.dept_id
+        and e.pos_id = p.pos_id
+        <if test="id!=null and id!='' ">
+            and e.emp_id like #{id}
+        </if>
+        <if test="name!=null and name!='' ">
+            and e.emp_name like #{name}
+        </if>
+        <if test="sex!=null and sex!='' ">
+            and e.sex like #{sex}
+        </if>
+    </select>
+    <!-- 添加员工 -->
+    <insert id="addEmployee" parameterType="Employee">
+        insert
+        into employee_tb(emp_name,sex,nation,location,party,armyday,birthday,workday, dept_id,pos_id)
+        values(#{name},#{sex},#{nation},#{location},#{party},#{armyday},#{birthday},#{workday},#{department.id},#{position.id})
+    </insert>
+    <!-- 修改员工 -->
+    <update id="updateEmployee" parameterType="Employee">
+        update employee_tb set
+            emp_name=#{name},sex=#{sex},nation=#{nation},location=#{location},party=#{party},armyday=#{armyday},birthday=#{birthday},dept_id=#{department.id},pos_id=#{position.id}
+        where emp_id=#{id}
+    </update>
+    <!-- 删除员工 -->
+    <delete id="deleteEmployee" parameterType="Integer">
+        delete from employee_tb
+        where
+            emp_id=#{id}
+    </delete>
+
+</mapper>
